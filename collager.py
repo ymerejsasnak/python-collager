@@ -96,13 +96,14 @@ class CollageMaker:
         for i in range(self.iterations):
 
             sample = choice(self.samples)
+            slice_length = randint(self.slice_length_min, self.slice_length_max)
 
-            if len(sample) > self.slice_length:
-                start = randint(0, len(sample) - self.slice_length)
-                sample = sample[start : start + self.slice_length]
+            if len(sample) > slice_length:  # if sample is smaller than slice length, it just uses entire sample
+                start = randint(0, len(sample) - slice_length)
+                sample = sample[start : start + slice_length]
                 
             sample = sample.apply_gain(db_adjust) 
-            self.collage = self.collage.overlay(sample, position=randint(0, self.output_length - self.slice_length))
+            self.collage = self.collage.overlay(sample, position=randint(0, self.output_length - slice_length))
                
         self.collage = normalize(self.collage)
         
