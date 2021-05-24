@@ -83,7 +83,7 @@ class CollageMaker:
 
     
     def update_settings(self, new_settings):
-        for k, v in new_settings:
+        for k, v in new_settings.items():
             self.settings[k] = v or self.settings[k]
     
     
@@ -129,9 +129,19 @@ class CollageMaker:
 
 
 
+test1 = {
+    'number_to_load': 5,
+    'output_length': 10000,
+    'slice_length': 200,
+    'iterations': 500,
+}
+
 
 c = CollageMaker()
 c.set_paths(get_wav_paths())
+
+c.update_settings(test1)
+
 c.choose_samples()
 c.create_collage()
 c.export_collage()
