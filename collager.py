@@ -52,17 +52,27 @@ class CollageMaker:
     def __init__(self):
         self.sample_count = 2
         self.output_length = 1000
+        
         self.slice_length_min = 50
         self.slice_length_max = 100
+        
+        self.slice_fade_in = .1  # 0..1  no fade to full length fade
+        self.slice_fade_out = .1  # 0..1  no fade to full length fade  (these will overlap if in+out > 1)
+        
         self.iterations = 10
     
     
     def update_settings(self, settings):
-        #get values from dictionary - can omit and will default to already set values
+        #get values from dictionary - can omit and will default to already set values   **ideally should check for validity/range
         self.sample_count = settings['sample_count'] or self.sample_count
         self.output_length = settings['output_length'] or self.output_length
+        
         self.slice_length_min = settings['slice_length_min'] or self.slice_length_min
         self.slice_length_max = settings['slice_length_max'] or self.slice_length_max
+        
+        self.slice_fade_in = settings['slice_fade_in'] or self.slice_fade_in
+        self.slice_fade_out = settings['slice_fade_out'] or self.slice_fade_out
+        
         self.iterations = settings['iterations'] or self.iterations
 
     
@@ -102,7 +112,10 @@ class CollageMaker:
                 start = randint(0, len(sample) - slice_length)
                 sample = sample[start : start + slice_length]
                 
-            sample = sample.apply_gain(db_adjust) 
+            sample = sample.apply_gain(db_adjust)
+                        
+            sample = sample.fade_in(int(self.slice_fade_in * slice_length)).fade_out(int(self.slice_fade_out * slice_length))
+       
             self.collage = self.collage.overlay(sample, position=randint(0, self.output_length - slice_length))
                
         self.collage = normalize(self.collage)
@@ -129,8 +142,10 @@ test1 = {
     'sample_count': 5,
     'output_length': 10000,
     'slice_length_min': 50,
-    'slice_length_max': 500,
-    'iterations': 100,
+    'slice_length_max': 150,
+    'slice_fade_in': 0,
+    'slice_fade_out': 1,
+    'iterations': 500,
 }
 
 
