@@ -104,6 +104,9 @@ class CollageMaker:
         db_adjust = 20 * log(1 / self.iterations, 10)    # really don't need to reduce gain by this much...maybe base more on rms of each sample?????
 
         for i in range(self.iterations):
+        
+            if i % (self.iterations // 10) == 0:
+                print("{} of {} done".format(i, self.iterations)), 
 
             sample = choice(self.samples)
             slice_length = randint(self.slice_length_min, self.slice_length_max)
@@ -149,27 +152,25 @@ test1 = {
 }
 
 test2 = {
-    'sample_count': 5,
+    'sample_count': 20,
     'output_length': 10000,
-    'slice_length_min': 50,
-    'slice_length_max': 150,
-    'slice_fade_in': 0,
-    'slice_fade_out': 1,
-    'iterations': 100,
+    'slice_length_min': 200,
+    'slice_length_max': 500,
+    'slice_fade_in': .1,
+    'slice_fade_out': .1,
+    'iterations': 500,
 }
 
-test3 = {}
 
 
 c = CollageMaker()
 
 c.set_paths(get_wav_paths())
-c.update_settings(test3)
+c.update_settings(test2)
 c.choose_samples()
 
 c.create_collage()
 c.export_collage()
-
 
 
 
