@@ -64,16 +64,16 @@ class CollageMaker:
     
     def update_settings(self, settings):
         #get values from dictionary - can omit and will default to already set values   **ideally should check for validity/range
-        self.sample_count = settings['sample_count'] or self.sample_count
-        self.output_length = settings['output_length'] or self.output_length
+        self.sample_count = settings.get('sample_count', self.sample_count)
+        self.output_length = settings.get('output_length', self.output_length)
         
-        self.slice_length_min = settings['slice_length_min'] or self.slice_length_min
-        self.slice_length_max = settings['slice_length_max'] or self.slice_length_max
+        self.slice_length_min = settings.get('slice_length_min', self.slice_length_min)
+        self.slice_length_max = settings.get('slice_length_max', self.slice_length_max)
         
-        self.slice_fade_in = settings['slice_fade_in'] or self.slice_fade_in
-        self.slice_fade_out = settings['slice_fade_out'] or self.slice_fade_out
+        self.slice_fade_in = settings.get('slice_fade_in', self.slice_fade_in)
+        self.slice_fade_out = settings.get('slice_fade_out', self.slice_fade_out)
         
-        self.iterations = settings['iterations'] or self.iterations
+        self.iterations = settings.get('iterations', self.iterations)
 
     
     def set_paths(self, paths):
@@ -145,14 +145,26 @@ test1 = {
     'slice_length_max': 150,
     'slice_fade_in': 0,
     'slice_fade_out': 1,
-    'iterations': 500,
+    'iterations': 100,
 }
+
+test2 = {
+    'sample_count': 5,
+    'output_length': 10000,
+    'slice_length_min': 50,
+    'slice_length_max': 150,
+    'slice_fade_in': 0,
+    'slice_fade_out': 1,
+    'iterations': 100,
+}
+
+test3 = {}
 
 
 c = CollageMaker()
 
 c.set_paths(get_wav_paths())
-c.update_settings(test1)
+c.update_settings(test3)
 c.choose_samples()
 
 c.create_collage()
