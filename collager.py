@@ -50,26 +50,31 @@ def get_wav_paths(parent_dir='D:/Samples', sub_dirs=[]):
 class CollageMaker:
        
     def __init__(self):
-        self.settings = {
-            'number_to_load': 2,
-            'output_length': 1000,
-            'slice_length': 100,
-            'iterations': 10,
-        }
+        self.sample_count = 2
+        self.output_length = 1000
+        self.slice_length_min = 50
+        self.slice_length_max = 100
+        self.iterations = 10
     
+    
+    def update_settings(self, settings):
+        #get values from dictionary - can omit and will default to already set values
+        self.sample_count = settings['sample_count'] or self.sample_count
+        self.output_length = settings['output_length'] or self.output_length
+        self.slice_length_min = settings['slice_length_min'] or self.slice_length_min
+        self.slice_length_max = settings['slice_length_max'] or self.slice_length_max
+        self.iterations = settings['iterations'] or self.iterations
+
     
     def set_paths(self, paths):
         self.paths = paths
     
     
     def choose_samples(self):
-        """
-       
-        """
 
         self.samples = []
 
-        while len(self.samples) < self.settings['number_to_load']:
+        while len(self.samples) < self.sample_count:
 
             path_choice = str(choice(self.paths))
 
@@ -81,33 +86,23 @@ class CollageMaker:
             except Exception:
                 print("cannot load " + path_choice)
 
-    
-    def update_settings(self, new_settings):
-        for k, v in new_settings.items():
-            self.settings[k] = v or self.settings[k]
-    
-    
-    
 
     def create_collage(self):
-        """
-             
-        """
         
-        self.collage = AudioSegment.silent(self.settings['output_length'], frame_rate=44100)
+        self.collage = AudioSegment.silent(self.output_length, frame_rate=44100)
 
-        db_adjust = 20 * log(1/self.settings['iterations'], 10)    # really don't need to reduce gain by this much...maybe base more on rms????
+        db_adjust = 20 * log(1 / self.iterations, 10)    # really don't need to reduce gain by this much...maybe base more on rms of each sample?????
 
-        for i in range(self.settings['iterations']):
+        for i in range(self.iterations):
 
             sample = choice(self.samples)
 
-            if len(sample) > self.settings['slice_length']:
-                start = randint(0, len(sample) - self.settings['slice_length'])
-                sample = sample[start : start + self.settings['slice_length']]
+            if len(sample) > self.slice_length:
+                start = randint(0, len(sample) - self.slice_length)
+                sample = sample[start : start + self.slice_length]
                 
             sample = sample.apply_gain(db_adjust) 
-            self.collage = self.collage.overlay(sample, position=randint(0, self.settings['output_length']-self.settings['slice_length']))
+            self.collage = self.collage.overlay(sample, position=randint(0, self.output_length - self.slice_length))
                
         self.collage = normalize(self.collage)
         
@@ -130,19 +125,20 @@ class CollageMaker:
 
 
 test1 = {
-    'number_to_load': 5,
+    'sample_count': 5,
     'output_length': 10000,
-    'slice_length': 200,
-    'iterations': 500,
+    'slice_length_min': 50,
+    'slice_length_max': 500,
+    'iterations': 100,
 }
 
 
 c = CollageMaker()
+
 c.set_paths(get_wav_paths())
-
 c.update_settings(test1)
-
 c.choose_samples()
+
 c.create_collage()
 c.export_collage()
 
