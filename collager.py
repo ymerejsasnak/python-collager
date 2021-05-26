@@ -105,13 +105,16 @@ class CollageMaker:
                 print("cannot load " + path_choice)
 
 
+
     def create_collage(self):
         
         self.collage = AudioSegment.silent(self.output_length, frame_rate=44100)
 
         db_adjust = 20 * log(1 / self.iterations, 10)    # really don't need to reduce gain by this much...maybe base more on rms of each sample?????
 
+
         for i in range(self.iterations):
+
         
             if i % (self.iterations // 10) == 0:
                 print("{} of {} done".format(i, self.iterations)), 
@@ -119,9 +122,11 @@ class CollageMaker:
             sample = choice(self.samples)
             slice_length = randint(self.length_min, self.length_max)
 
+
             if len(sample) > slice_length:  # if sample is smaller than slice length, it just uses entire sample
                 start = randint(0, len(sample) - slice_length)
                 sample = sample[start : start + slice_length]
+
                 
             sample = sample.apply_gain(db_adjust)
                         
@@ -131,8 +136,16 @@ class CollageMaker:
                 
             if self.fade_out > 0:
                 sample = sample.fade_out(int(self.fade_out * slice_length))
-       
-            self.collage = self.collage.overlay(sample, position=randint(0, self.output_length - slice_length))
+
+            position = randint(0, self.output_length - slice_length)
+            repeats = randint(self.repeat_min, self.repeat_max)
+            counter = 0
+            while counter < repeats and position + slice_length < self.output_length:
+                self.collage = self.collage.overlay(sample, position=position)
+                position += slice_length
+                counter += 1
+                
+
                
         self.collage = normalize(self.collage)
         
@@ -167,18 +180,20 @@ class CollageMaker:
 
 
 
+# repetition spacing (min/max and hold/random)
+
 
 
 test1 = {
-    'sample_count': 5,
-    'output_length': 10000,
+    'sample_count': 50,
+    'output_length': 30000,
     
     'length_min': 50,
     'length_max': 150,
     'fade_in': 0,
-    'fade_out': 0,
-    'repeat_min': 1,
-    'repeat_max': 10,
+    'fade_out': 1,
+    'repeat_min': 5,
+    'repeat_max': 20,
     
     'iterations': 100,
 }
