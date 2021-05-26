@@ -53,11 +53,16 @@ class CollageMaker:
         self.sample_count = 2
         self.output_length = 1000
         
-        self.slice_length_min = 50
-        self.slice_length_max = 100
+        # slice length range
+        self.length_min = 50
+        self.length_max = 100
         
-        self.slice_fade_in = .1  # 0..1  no fade to full length fade
-        self.slice_fade_out = .1  # 0..1  no fade to full length fade  (these will overlap if in+out > 1)
+        self.fade_in = .1  # 0..1  no fade to full length fade
+        self.fade_out = .1  # 0..1  no fade to full length fade  (these will overlap if in+out > 1)
+        
+        # number of times to repeat slice
+        self.repeat_min = 1
+        self.repeat_max = 1
         
         self.iterations = 10
     
@@ -67,11 +72,14 @@ class CollageMaker:
         self.sample_count = settings.get('sample_count', self.sample_count)
         self.output_length = settings.get('output_length', self.output_length)
         
-        self.slice_length_min = settings.get('slice_length_min', self.slice_length_min)
-        self.slice_length_max = settings.get('slice_length_max', self.slice_length_max)
+        self.length_min = settings.get('length_min', self.length_min)
+        self.length_max = settings.get('length_max', self.length_max)
         
-        self.slice_fade_in = settings.get('slice_fade_in', self.slice_fade_in)
-        self.slice_fade_out = settings.get('slice_fade_out', self.slice_fade_out)
+        self.fade_in = settings.get('fade_in', self.fade_in)
+        self.fade_out = settings.get('fade_out', self.fade_out)
+        
+        self.repeat_min = settings.get('repeat_min', self.repeat_min)
+        self.repeat_max = settings.get('repeat_max', self.repeat_max)
         
         self.iterations = settings.get('iterations', self.iterations)
 
@@ -109,7 +117,7 @@ class CollageMaker:
                 print("{} of {} done".format(i, self.iterations)), 
 
             sample = choice(self.samples)
-            slice_length = randint(self.slice_length_min, self.slice_length_max)
+            slice_length = randint(self.length_min, self.length_max)
 
             if len(sample) > slice_length:  # if sample is smaller than slice length, it just uses entire sample
                 start = randint(0, len(sample) - slice_length)
@@ -117,7 +125,12 @@ class CollageMaker:
                 
             sample = sample.apply_gain(db_adjust)
                         
-            sample = sample.fade_in(int(self.slice_fade_in * slice_length)).fade_out(int(self.slice_fade_out * slice_length))
+           
+            if self.fade_in > 0:
+                sample = sample.fade_in(int(self.fade_in * slice_length))
+                
+            if self.fade_out > 0:
+                sample = sample.fade_out(int(self.fade_out * slice_length))
        
             self.collage = self.collage.overlay(sample, position=randint(0, self.output_length - slice_length))
                
@@ -125,8 +138,8 @@ class CollageMaker:
         
         
     
-    def export_collage(self):
-        self.collage.export(datetime.now().strftime('%m-%d-%Y %H.%M.%S.wav'), format='wav')
+    def export_collage(self, str_prefix=''):
+        self.collage.export(datetime.now().strftime(str_prefix + '%m-%d-%Y %H.%M.%S.wav'), format='wav')
     
     
     
@@ -134,30 +147,53 @@ class CollageMaker:
 
 
 
+# normalize slices before applying gain reduction?  
+# deal with gain adjustments using rms rather than peak would prob be better
 
-# ideas - min/max length, recurring sounds, repetitions, xfade, changes(pitch/vol/pan/etc), fx(filter, others), overlay, reverse, pieces of sounds
+# more settings:  repetitions(min, max?), sound changes(pitch, vol, pan, etc) and fx (filter, bitcrush, etc), reverse %
+# sync to bpm option?  -  then have specific algorithms for rhythmic collage vs melodic????
+
+# incorporate freesound stuff (and can use various categories/filters)
+
+# more advanced stuff: feature detection/analysis for more intelligent collaging (note, spectrum, beatdetection, etc)
+# ML stuff to identify aspects of a sound?
+    
+
+
+
+# ideas - recurring sounds (ie create a pool of reusable slices from pool of samples -- even slightly different slices)
+        #repetitions, xfade, pitch/vol/pan/filter/etc, overlay %, reverse %, pieces of sounds
 #sync to a bpm?  rhythmic and or melodic algorithms?   note/beat detection...etc
-#normalize slices before adding them
+
+
 
 
 
 test1 = {
     'sample_count': 5,
     'output_length': 10000,
-    'slice_length_min': 50,
-    'slice_length_max': 150,
-    'slice_fade_in': 0,
-    'slice_fade_out': 1,
+    
+    'length_min': 50,
+    'length_max': 150,
+    'fade_in': 0,
+    'fade_out': 0,
+    'repeat_min': 1,
+    'repeat_max': 10,
+    
     'iterations': 100,
 }
 
 test2 = {
     'sample_count': 20,
     'output_length': 10000,
-    'slice_length_min': 200,
-    'slice_length_max': 500,
-    'slice_fade_in': .1,
-    'slice_fade_out': .1,
+    'length_min': 200,
+    'length_max': 500,
+    'fade_in': .1,
+    'fade_out': .1,
+    
+    'repeat_min': 2,
+    'repeat_max': 4,
+    
     'iterations': 500,
 }
 
@@ -166,11 +202,11 @@ test2 = {
 c = CollageMaker()
 
 c.set_paths(get_wav_paths())
-c.update_settings(test2)
+c.update_settings(test1)
 c.choose_samples()
 
 c.create_collage()
-c.export_collage()
+c.export_collage('t1 ')
 
 
 
