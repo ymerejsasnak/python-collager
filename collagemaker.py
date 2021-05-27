@@ -5,8 +5,6 @@ from random import choice, randint
 from math import log
 from datetime import datetime
 
-from collagesettings import CollageSettings
-
 
 class CollageMaker:
 
@@ -14,19 +12,7 @@ class CollageMaker:
         self.settings = CollageSettings()
         self.samples = []
 
-    def choose_samples(self):
 
-        while len(self.samples) < self.settings.sample_count:
-
-            path_choice = str(choice(self.settings.paths))
-
-            try:
-                sample = AudioSegment.from_file(path_choice, format='wav')
-                self.samples.append(sample)
-                print("loaded " + path_choice)
-
-            except Exception:
-                print("cannot load " + path_choice)
 
     def create_collage(self):
 
