@@ -6,7 +6,7 @@ from random import choice, randint
 from math import log
 from datetime import datetime
 
-from collagemaker.section import Section
+#from collagemaker.section import Section
 
 
 class Collage:

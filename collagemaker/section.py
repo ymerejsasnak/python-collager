@@ -1,26 +1,40 @@
+from random import choices, randint
+from typing import List
+
+import numpy as np
+
+from collagemaker.collage import Collage
+from collagemaker.motif import Motif
+
+
 class Section:
 
-    def __init__(self, samples, length):
-
+    def __init__(self, samples: List[np.ndarray], name: str, length: int = 10):
         self.sample_pool = samples
+        self.name = name
+        self.length = length  # in seconds
 
-        self.length = length    # in seconds
-        self.fade_in = 0        # 0..1 of length
-        self.fade_out = 0       # 0..1 of length
+        self.motifs = []
 
-        # build these similarly to collage building sections?
-        self.motifs = []        # collections of gestures
-        self.gestures = []      # free gestures not part of a motif
+        self.data = np.zeros(int(length * 1000 * Collage.SAMPLES_PER_MS))
 
+        self.compose()
+    # section maybe handles creation of each lower level for more control of each in a less hierarchical way?
 
+    def compose(self):
+        # motif count, paste count
 
-
-    def create_section(self, name, sample_pool_size=5, length=1):
         samples = []
 
-        for i in range(sample_pool_size):
-            samples.append(choice(self.sample_pool))
+        motif_count = 10
+        samples_per_motif = 3
+        motif_occurrences = 3
 
-        section = Section(samples, length)
-        self.sections[name] = section
+        self.motifs = [Motif(choices(self.sample_pool, k=samples_per_motif)) for _ in range(motif_count)]
 
+        for motif in self.motifs:
+            for i in range(motif_occurrences):
+                start = randint(0, len(self.data) - len(motif.data))
+                new_data = np.pad(motif.data, (start, len(self.data) - (len(motif.data) + start)))
+
+                self.data = np.add(self.data, new_data)

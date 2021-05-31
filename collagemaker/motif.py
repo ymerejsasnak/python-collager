@@ -10,7 +10,6 @@ class Motif:
 
     def __init__(self, sample_pool: List[np.ndarray], gestures_min: int = 1, gestures_max: int = 5, fade_in: float = .1,
                  fade_out: float = .1):
-
         self.data = None
 
         self.sample_pool = sample_pool
