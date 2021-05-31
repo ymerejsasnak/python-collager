@@ -11,6 +11,8 @@ from collagemaker.section import Section
 
 class Collage:
 
+    SAMPLES_PER_MS = 44.1
+
     def __init__(self):
         self.paths = []  # all potentially valid wav paths
         self.sample_pool = []
@@ -56,5 +58,5 @@ class Collage:
         section = Section(samples, length)
         self.sections[name] = section
 
-    def build_structure(self, structure):
-        self.structure = structure
+    def build_structure(self, *section_list):
+        self.structure = section_list
