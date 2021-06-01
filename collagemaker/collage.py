@@ -17,8 +17,6 @@ class Collage:
         self.audio.load_wav_paths(parent_dir=parent_dir, sub_dirs=sub_dirs)
         self.audio.build_sample_pool()
 
-        self.data = None
-
     def create_section(self, name: str, sample_pool_size: int = 10, length: int = 20):
 
         data_to_use = [choice(self.audio.sample_pool) for _ in range(sample_pool_size)]
@@ -31,7 +29,7 @@ class Collage:
 
         self.structure = section_list
 
-        output_data = np.empty(0)
+        output_data = [np.empty(0), np.empty(0)]
         used_sections = []
 
         for section in self.structure:
@@ -39,8 +37,9 @@ class Collage:
                 self.sections[section].compose()  # redo the section
             else:
                 used_sections.append(section)
-            output_data = np.append(output_data, self.sections[section].data)
 
-        output_data /= max(output_data.max(initial=0), abs(output_data.min(initial=0)))
+            for ch in range(2):
+                output_data[ch] = np.append(output_data[ch], self.sections[section].data[ch])
+
         self.audio.output_data = output_data
 

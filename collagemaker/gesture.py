@@ -8,9 +8,9 @@ from collagemaker.slice import Slice
 
 class Gesture:
 
-    def __init__(self, sample_data: np.ndarray, repeats: range = range(1, 10), fades: Tuple[float] = (0.1, 0.1)):
+    def __init__(self, sample_data: Tuple[np.ndarray], repeats: range = range(1, 10), fades: Tuple[float] = (0.1, 0.1)):
 
-        self.data = None
+        self.data = []
 
         self.slc = Slice(sample_data)
 
@@ -20,8 +20,10 @@ class Gesture:
         self.compose()
 
     def compose(self):
+        self.data = []
+
         repeats = choice(self.repeats)
-        gesture_length = len(self.slc.data) * repeats
+        gesture_length = len(self.slc.data[0]) * repeats
 
         fade_in_length = int(self.fades[0] * gesture_length)
         fade_out_length = int(self.fades[1] * gesture_length)
@@ -33,4 +35,5 @@ class Gesture:
         fade_out_env = np.insert(np.ones(gesture_length - fade_out_length), gesture_length - fade_out_length,
                                  fade_out_env)
 
-        self.data = np.tile(self.slc.data, repeats) * fade_in_env * fade_out_env
+        for ch in range(2):
+            self.data.append(np.tile(self.slc.data[ch], repeats) * fade_in_env * fade_out_env)
