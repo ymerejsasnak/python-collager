@@ -7,7 +7,7 @@ from collagemaker.slice import Slice
 
 class Gesture:
 
-    def __init__(self, sample_data: np.ndarray, repeat_min: int = 1, repeat_max: int = 1, fade_in: float = 0,
+    def __init__(self, sample_data: np.ndarray, repeat_min: int = 1, repeat_max: int = 10, fade_in: float = 0,
                  fade_out: float = 0):
 
         self.data = None

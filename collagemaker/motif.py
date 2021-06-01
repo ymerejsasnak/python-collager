@@ -8,8 +8,8 @@ from collagemaker.gesture import Gesture
 
 class Motif:
 
-    def __init__(self, sample_pool: List[np.ndarray], gestures_min: int = 1, gestures_max: int = 5, fade_in: float = .1,
-                 fade_out: float = .1):
+    def __init__(self, sample_pool: List[np.ndarray], gestures_min: int = 2, gestures_max: int = 10, fade_in: float = 0,
+                 fade_out: float = 0):
         self.data = None
 
         self.sample_pool = sample_pool

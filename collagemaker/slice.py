@@ -7,8 +7,8 @@ import collagemaker.collage as cm
 
 class Slice:
 
-    def __init__(self, source_data: np.ndarray, length_min: int = 100, length_max: int = 200, fade_in: float = 0,
-                 fade_out: float = 0.1):
+    def __init__(self, source_data: np.ndarray, length_min: int = 100, length_max: int = 300, fade_in: float = 0.01,
+                 fade_out: float = 0.01):
 
         self.source_data = source_data
         self.len_min = length_min
