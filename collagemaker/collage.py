@@ -76,7 +76,26 @@ class Collage:
         for section in self.structure:
             output_data = np.append(output_data, self.sections[section].data)
 
-        output_data /= max(output_data.max(initial=0), abs(output_data.min(initial=0)))
+        '''
+        plot below shows that it seems to work
+        just need to normalize to 1 (and convert back to 16/32 bit?)
+        then figure out how to get it to export to wav (prob just with scipy, no need for pydub?)
+        '''
+
+        output_data /= max(output_data.max(), abs(output_data.min()))
+
+        #plt.xlim((0, len(output_data)))
+        #plt.plot(output_data)
+        #plt.show()
 
         filename = 'd:\\CODING\\Python\\Audio\\Collager\\%m-%d-%Y %H.%M.%S.wav'
         scipy.io.wavfile.write(datetime.now().strftime(filename), 44100, output_data)
+
+        # wav_io = io.BytesIO()
+        #
+        # wav_io.seek(0)
+        #
+        # out = pydub.AudioSegment.from_wav(wav_io)
+        # out = normalize(out)
+        #
+        # out.export(, format='wav')
