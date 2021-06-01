@@ -1,13 +1,12 @@
-from collagemaker.collage import Collage
+import collagemaker.collage as cm
 
-c = Collage()
+c = cm.Collage()
 
 c.load_wav_paths()
-c.build_sample_pool(sample_pool_size=15)
+c.build_sample_pool()
 
 c.create_section('a')
 c.create_section('b')
-c.build_structure('a', 'b', 'a')
+c.build('a', 'b', 'a')
 
-# c.create_collage()
-# c.export_collage()
+

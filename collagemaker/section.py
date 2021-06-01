@@ -3,20 +3,19 @@ from typing import List
 
 import numpy as np
 
-from collagemaker.collage import Collage
+import collagemaker.collage as cm
 from collagemaker.motif import Motif
 
 
 class Section:
 
-    def __init__(self, samples: List[np.ndarray], name: str, length: int = 10):
+    def __init__(self, samples: List[np.ndarray], length: int = 10):
         self.sample_pool = samples
-        self.name = name
         self.length = length  # in seconds
 
         self.motifs = []
 
-        self.data = np.zeros(int(length * 1000 * Collage.SAMPLES_PER_MS))
+        self.data = np.zeros(int(length * 1000 * cm.Collage.SAMPLES_PER_MS))
 
         self.compose()
     # section maybe handles creation of each lower level for more control of each in a less hierarchical way?

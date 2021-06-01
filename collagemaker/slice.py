@@ -2,7 +2,7 @@ from random import randint
 
 import numpy as np
 
-from collagemaker.collage import Collage
+import collagemaker.collage as cm
 
 
 class Slice:
@@ -23,7 +23,7 @@ class Slice:
     def compose(self):
 
         # decide length in samples
-        length = int(randint(self.len_min, self.len_max) * Collage.SAMPLES_PER_MS)
+        length = int(randint(self.len_min, self.len_max) * cm.Collage.SAMPLES_PER_MS)
 
         # decide portion of sample to use (if smaller than 'length' just uses entire sample)
         offset = 0

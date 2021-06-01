@@ -1,16 +1,20 @@
+import numpy as np
+import pydub
+import scipy.io.wavfile
+import io
+
 from pydub import AudioSegment
 from pydub.effects import normalize
 
 from pathlib import Path
-from random import choice, randint
-from math import log
+from random import choice
 from datetime import datetime
 
-#from collagemaker.section import Section
+from collagemaker.section import Section
 
+import matplotlib.pyplot as plt
 
 class Collage:
-
     SAMPLES_PER_MS = 44.1
 
     def __init__(self):
@@ -34,29 +38,56 @@ class Collage:
                 p = Path(parent_dir + '/' + sub)
                 self.paths.extend(list(p.glob('**/*.wav')))
 
-    def build_sample_pool(self, sample_pool_size=5):
+    def build_sample_pool(self, sample_pool_size=20):
 
         while len(self.sample_pool) < sample_pool_size:
 
             path_attempt = str(choice(self.paths))
 
             try:
-                sample = AudioSegment.from_file(path_attempt, format='wav')
-                self.sample_pool.append(sample)
+                seg = AudioSegment.from_file(path_attempt, format='wav')
+                seg.set_frame_rate(44100)
+                segs = seg.split_to_mono()
+                samples = [s.get_array_of_samples() for s in segs]
+                data = np.array(samples[0]).T.astype(np.float32)  # just doing left channel for now (samples[0])
+                data /= np.iinfo(samples[0].typecode).max
+                self.sample_pool.append(data)
+
                 print("loaded " + path_attempt)
 
-            except Exception:
+            except IOError:
                 print("cannot load " + path_attempt)
 
-    def create_section(self, name, sample_pool_size=5, length=1):
+    def create_section(self, name, sample_pool_size=5, length=10):
 
-        samples = []
+        data_to_use = [choice(self.sample_pool) for _ in range(sample_pool_size)]
 
-        for i in range(sample_pool_size):
-            samples.append(choice(self.sample_pool))
+        section = Section(data_to_use, length)
 
-        section = Section(samples, length)
         self.sections[name] = section
 
-    def build_structure(self, *section_list):
+    def build(self, *section_list):
         self.structure = section_list
+
+        output_data = np.empty(0)
+
+        for section in self.structure:
+            output_data = np.append(output_data, self.sections[section].data)
+
+        '''
+        plot below shows that it seems to work
+        just need to normalize to 1 (and convert back to 16 bit?)
+        then figure out how to get it to export to wav (prob just with scipy, no need for pydub?)
+        '''
+
+        plt.plot(output_data)
+        plt.show()
+
+        # wav_io = io.BytesIO()
+        # scipy.io.wavfile.write(wav_io, 44100, output_data)
+        # wav_io.seek(0)
+        #
+        # out = pydub.AudioSegment.from_wav(wav_io)
+        # out = normalize(out)
+        #
+        # out.export(datetime.now().strftime('d:\\CODING\\Python\\Audio\\Collager\\%m-%d-%Y %H.%M.%S.wav'), format='wav')
