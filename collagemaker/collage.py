@@ -14,6 +14,7 @@ from collagemaker.section import Section
 
 import matplotlib.pyplot as plt
 
+
 class Collage:
     SAMPLES_PER_MS = 44.1
 
@@ -45,8 +46,9 @@ class Collage:
             path_attempt = str(choice(self.paths))
 
             try:
-                seg = AudioSegment.from_file(path_attempt, format='wav')
-                seg.set_frame_rate(44100)
+                seg = AudioSegment.from_file(path_attempt, format='wav')  # could just load w/ scipy
+                seg.set_frame_rate(
+                    44100)  # can do with audioop.ratecv (thats what pydub uses) -- just need to figure out 'fragment'
                 segs = seg.split_to_mono()
                 samples = [s.get_array_of_samples() for s in segs]
                 data = np.array(samples[0]).T.astype(np.float32)  # just doing left channel for now (samples[0])
@@ -74,20 +76,7 @@ class Collage:
         for section in self.structure:
             output_data = np.append(output_data, self.sections[section].data)
 
-        '''
-        plot below shows that it seems to work
-        just need to normalize to 1 (and convert back to 16 bit?)
-        then figure out how to get it to export to wav (prob just with scipy, no need for pydub?)
-        '''
+        output_data /= max(output_data.max(initial=0), abs(output_data.min(initial=0)))
 
-        plt.plot(output_data)
-        plt.show()
-
-        # wav_io = io.BytesIO()
-        # scipy.io.wavfile.write(wav_io, 44100, output_data)
-        # wav_io.seek(0)
-        #
-        # out = pydub.AudioSegment.from_wav(wav_io)
-        # out = normalize(out)
-        #
-        # out.export(datetime.now().strftime('d:\\CODING\\Python\\Audio\\Collager\\%m-%d-%Y %H.%M.%S.wav'), format='wav')
+        filename = 'd:\\CODING\\Python\\Audio\\Collager\\%m-%d-%Y %H.%M.%S.wav'
+        scipy.io.wavfile.write(datetime.now().strftime(filename), 44100, output_data)
