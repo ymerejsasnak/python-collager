@@ -3,7 +3,7 @@ from typing import List
 
 import numpy as np
 
-import collagemaker.collage as cm
+from collagemaker.audio import Audio
 from collagemaker.motif import Motif
 
 
@@ -15,7 +15,7 @@ class Section:
 
         self.motifs = []
 
-        self.data = np.zeros(int(length * 1000 * cm.Collage.SAMPLES_PER_MS))
+        self.data = np.zeros(int(length * 1000 * Audio.SAMPLES_PER_MS))
 
         self.compose()
     # section maybe handles creation of each lower level for more control of each in a less hierarchical way?
