@@ -25,6 +25,7 @@ class Section:
         motif_count = 5
         samples_per_motif = 2
         motif_occurrences = 3
+        overlap = .1
 
         self.motifs = [Motif(choices(self.sample_pool, k=samples_per_motif)) for _ in range(motif_count)]
 

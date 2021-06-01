@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 import scipy.io.wavfile
@@ -9,6 +9,20 @@ from pathlib import Path
 from random import choice
 from datetime import datetime
 
+
+def fade(data: np.ndarray, fades: Tuple[float]):
+    length = len(data)
+
+    fade_in_length = int(fades[0] * length)
+    fade_out_length = int(fades[1] * length)
+
+    fade_in_env = np.linspace(start=0, stop=1, num=fade_in_length)
+    fade_in_env = np.append(fade_in_env, np.ones(length - fade_in_length))
+
+    fade_out_env = np.linspace(start=1, stop=0, num=fade_out_length)
+    fade_out_env = np.insert(np.ones(length - fade_out_length), length - fade_out_length, fade_out_env)
+
+    return data * fade_in_env * fade_out_env
 
 
 class Audio:
@@ -73,7 +87,3 @@ class Audio:
                 self.output_data[ch] /= mx
 
         scipy.io.wavfile.write(datetime.now().strftime(path), 44100, np.array(self.output_data).T)
-
-
-
-
