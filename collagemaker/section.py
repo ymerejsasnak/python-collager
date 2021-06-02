@@ -9,7 +9,7 @@ from collagemaker.motif import Motif
 
 class Section:
 
-    def __init__(self, samples: List[Tuple[np.ndarray]], length: int = 20):
+    def __init__(self, samples: List[Tuple[np.ndarray]], length: int = 30):
         self.sample_pool = samples
         self.length = length  # in seconds
 
@@ -22,16 +22,15 @@ class Section:
 
     def compose(self):
 
-        motif_count = 5
-        samples_per_motif = 2
-        motif_occurrences = 3
-        overlap = .1
+        motif_count = 10
+        samples_per_motif = 4
+        motif_occurrences = 2
 
         self.motifs = [Motif(choices(self.sample_pool, k=samples_per_motif)) for _ in range(motif_count)]
 
         for motif in self.motifs:
             for i in range(motif_occurrences):
+                start = randint(0, len(self.data[0]) - len(motif.data[0])) #this was the line that split the stereo
                 for ch in range(2):
-                    start = randint(0, len(self.data[ch]) - len(motif.data[ch]))
                     data = np.pad(motif.data[ch], (start, len(self.data[ch]) - (len(motif.data[ch]) + start)))
                     self.data[ch] += data
