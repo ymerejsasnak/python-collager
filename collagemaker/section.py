@@ -9,13 +9,13 @@ from collagemaker.motif import Motif
 
 class Section:
 
-    def __init__(self, samples: List[Tuple[np.ndarray]], length: int = 30):
+    def __init__(self, samples: List[np.ndarray], length: int = 30):
         self.sample_pool = samples
         self.length = length  # in seconds
 
         self.motifs = []
 
-        self.data = [np.zeros(int(length * 1000 * Audio.SAMPLES_PER_MS)) for _ in range(2)]
+        self.data = np.zeros(shape=(int(length * 1000 * Audio.SAMPLES_PER_MS), 2))
 
         self.compose()
     # section maybe handles creation of each lower level for more control of each in a less hierarchical way?
@@ -30,7 +30,8 @@ class Section:
 
         for motif in self.motifs:
             for i in range(motif_occurrences):
-                start = randint(0, len(self.data[0]) - len(motif.data[0])) #this was the line that split the stereo
-                for ch in range(2):
-                    data = np.pad(motif.data[ch], (start, len(self.data[ch]) - (len(motif.data[ch]) + start)))
-                    self.data[ch] += data
+
+                start = randint(0, len(self.data) - len(motif.data))
+
+                data = np.pad(motif.data, pad_width=((start, len(self.data) - (len(motif.data) + start)), (0, 0)))
+                self.data += data

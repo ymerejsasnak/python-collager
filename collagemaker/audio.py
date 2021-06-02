@@ -16,11 +16,11 @@ def fade(data: np.ndarray, fades: Tuple[float]):
     fade_in_length = int(fades[0] * length)
     fade_out_length = int(fades[1] * length)
 
-    fade_in_env = np.linspace(start=0, stop=1, num=fade_in_length)
-    fade_in_env = np.append(fade_in_env, np.ones(length - fade_in_length))
+    fade_in_env = np.linspace(start=(0, 0), stop=(1, 1), num=fade_in_length)
+    fade_in_env = np.append(fade_in_env, np.ones((length - fade_in_length, 2)), axis=0)
 
-    fade_out_env = np.linspace(start=1, stop=0, num=fade_out_length)
-    fade_out_env = np.insert(np.ones(length - fade_out_length), length - fade_out_length, fade_out_env)
+    fade_out_env = np.linspace(start=(1, 1), stop=(0, 0), num=fade_out_length)
+    fade_out_env = np.insert(np.ones((length - fade_out_length, 2)), length - fade_out_length, fade_out_env, axis=0)
 
     return data * fade_in_env * fade_out_env
 
@@ -32,7 +32,7 @@ class Audio:
         self.paths = []  # all potentially valid wav paths
         self.sample_pool = []
 
-        self.output_data = []
+        self.output_data = None
 
     def load_wav_paths(self, parent_dir: str, sub_dirs: List[str]):
 
@@ -69,11 +69,9 @@ class Audio:
                     seg = seg.set_channels(2)
                 segs = seg.split_to_mono()
                 samples = [s.get_array_of_samples() for s in segs]
-                left = np.array(samples[0]).T.astype(np.float32)
-                left /= np.iinfo(samples[0].typecode).max
-                right = np.array(samples[1]).T.astype(np.float32)
-                right /= np.iinfo(samples[0].typecode).max
-                self.sample_pool.append((left, right))
+                data = np.array(samples).T.astype(np.float32)
+                data /= np.iinfo(samples[0].typecode).max
+                self.sample_pool.append(data)
 
                 print("loaded " + path_attempt)
 
@@ -81,9 +79,8 @@ class Audio:
         path = 'd:\\CODING\\Python\\Audio\\Collager\\' + filename
 
         # normalize
-        for ch in range(2):
-            mx = max(self.output_data[ch].max(initial=0), abs(self.output_data[ch].min(initial=0)))
-            if mx != 0:
-                self.output_data[ch] /= mx
+        mx = max(self.output_data.max(initial=0), abs(self.output_data.min(initial=0)))
+        if mx != 0:
+            self.output_data /= mx
 
-        scipy.io.wavfile.write(datetime.now().strftime(path), 44100, np.array(self.output_data).T)
+        scipy.io.wavfile.write(datetime.now().strftime(path), 44100, np.array(self.output_data))

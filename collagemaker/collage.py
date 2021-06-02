@@ -29,26 +29,25 @@ class Collage:
 
         self.structure = section_list
 
-        full_length = sum([len(self.sections[section].data[0]) for section in self.structure])
-        output_data = [np.zeros(full_length), np.zeros(full_length)]
+        full_length = sum([len(self.sections[section].data) for section in self.structure]) # subtract overlap though
+        output_data = np.zeros(shape=(full_length, 2))
         used_sections = []
 
         overlap = .1
         start = 0
 
-        for section in self.structure:
+        for section_name in self.structure:
 
-            if section in used_sections:
-                self.sections[section].compose()  # redo the section
+            if section_name in used_sections:
+                self.sections[section_name].compose()  # redo the section (currently overlays on existing)
             else:
-                used_sections.append(section)
+                used_sections.append(section_name)
 
-            for ch in range(2):
-                d = self.sections[section].data[ch]
-                d = np.pad(d, (start, full_length - (start + len(d))))
-                output_data[ch] += d
+            d = self.sections[section_name].data
+            d = np.pad(d, pad_width=((start, full_length - (start + len(d))), (0, 0)))
+            output_data += d
 
-            start += int(len(self.sections[section].data[0]) * (1 - overlap))
+            start += int(len(self.sections[section_name].data) * (1 - overlap))
 
         self.audio.output_data = output_data
 

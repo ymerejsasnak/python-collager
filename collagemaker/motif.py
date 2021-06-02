@@ -9,8 +9,8 @@ from collagemaker.gesture import Gesture
 
 class Motif:
 
-    def __init__(self, sample_pool: List[Tuple[np.ndarray]], counts: range = range(2, 10), fades: Tuple[float] = (0, 0)):
-        self.data = []
+    def __init__(self, sample_pool: List[np.ndarray], counts: range = range(2, 10), fades: Tuple[float] = (0, 0)):
+        self.data = None
 
         self.sample_pool = sample_pool
         self.counts = counts
@@ -21,13 +21,11 @@ class Motif:
         self.compose()
 
     def compose(self):
-        self.data = []
 
         count = choice(self.counts)
 
         # create gestures
         self.gestures = [Gesture(choice(self.sample_pool)) for _ in range(count)]
 
-        for ch in range(2):
-            gesture_data = [fade(g.data[ch], self.fades) for g in self.gestures]
-            self.data.append(np.concatenate(gesture_data))
+        self.data = [fade(g.data, self.fades) for g in self.gestures]
+        self.data = np.concatenate(self.data)
