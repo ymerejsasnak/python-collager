@@ -34,9 +34,7 @@ class Collage:
 
         self.sections[name] = section
 
-    def build(self, *section_list):
-
-        self.structure = section_list
+    def build(self):
 
         full_length = sum([len(self.sections[section].data) for section in self.structure])  # subtract overlap though
         output_data = np.zeros(shape=(full_length, 2))
