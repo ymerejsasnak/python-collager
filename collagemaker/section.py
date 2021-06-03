@@ -1,9 +1,9 @@
 from random import choices, randint
-from typing import List, Tuple
+from typing import List
 
 import numpy as np
 
-from collagemaker.audio import Audio
+from collagemaker.utility import SAMPLES_PER_MS
 from collagemaker.motif import Motif
 
 
@@ -15,7 +15,7 @@ class Section:
 
         self.motifs = []
 
-        self.data = np.zeros(shape=(int(length * 1000 * Audio.SAMPLES_PER_MS), 2))
+        self.data = np.zeros(shape=(int(length * 1000 * SAMPLES_PER_MS), 2))
 
         self.compose()
     # section maybe handles creation of each lower level for more control of each in a less hierarchical way?

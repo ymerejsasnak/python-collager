@@ -3,7 +3,7 @@ from typing import Tuple
 
 import numpy as np
 
-from collagemaker.audio import fade
+from collagemaker.utility import apply_fades
 from collagemaker.slice import Slice
 
 
@@ -25,4 +25,4 @@ class Gesture:
         repeats = choice(self.repeats)
 
         self.data = np.tile(self.slc.data, (repeats, 1))
-        self.data = fade(self.data, self.fades)
+        self.data = apply_fades(self.data, self.fades)

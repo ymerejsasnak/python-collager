@@ -1,9 +1,9 @@
-from random import randint, choice
+from random import choice
 
 import numpy as np
 from typing import List, Tuple
 
-from collagemaker.audio import fade
+from collagemaker.utility import apply_fades
 from collagemaker.gesture import Gesture
 
 
@@ -27,5 +27,5 @@ class Motif:
         # create gestures
         self.gestures = [Gesture(choice(self.sample_pool)) for _ in range(count)]
 
-        self.data = [fade(g.data, self.fades) for g in self.gestures]
+        self.data = [apply_fades(g.data, self.fades) for g in self.gestures]
         self.data = np.concatenate(self.data)

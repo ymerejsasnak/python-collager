@@ -3,8 +3,8 @@ from typing import Tuple
 
 import numpy as np
 
-from collagemaker.audio import Audio
-from collagemaker.audio import fade
+from collagemaker.utility import SAMPLES_PER_MS
+from collagemaker.utility import apply_fades
 
 
 class Slice:
@@ -20,7 +20,7 @@ class Slice:
 
     def compose(self):
         # decide length in samples
-        length = int(choice(self.lengths) * Audio.SAMPLES_PER_MS)
+        length = int(choice(self.lengths) * SAMPLES_PER_MS)
 
         # decide portion of sample to use (if smaller than 'length' just uses entire sample)
         offset = 0
@@ -29,4 +29,4 @@ class Slice:
         else:
             length = len(self.source_data)
 
-        self.data = fade(self.source_data[offset: offset + length], self.fades)
+        self.data = apply_fades(self.source_data[offset: offset + length], self.fades)

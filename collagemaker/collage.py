@@ -3,8 +3,9 @@ from typing import List
 
 import numpy as np
 
+
 from collagemaker.section import Section
-from collagemaker.audio import Audio
+from collagemaker.utility import load_wav_paths, build_sample_pool, export
 
 
 class Collage:
@@ -13,13 +14,12 @@ class Collage:
         self.sections = {}  # section label/name as key and section object as val
         self.structure = []  # list of section labels in order for piece
 
-        self.audio = Audio()
-        self.audio.load_wav_paths(parent_dir=parent_dir, sub_dirs=sub_dirs)
-        self.audio.build_sample_pool()
+        self.paths = load_wav_paths(parent_dir=parent_dir, sub_dirs=sub_dirs)
+        self.sample_pool = build_sample_pool(self.paths)
 
     def create_section(self, name: str, sample_pool_size: int = 10, length: int = 20):
 
-        data_to_use = [choice(self.audio.sample_pool) for _ in range(sample_pool_size)]
+        data_to_use = [choice(self.sample_pool) for _ in range(sample_pool_size)]
 
         section = Section(data_to_use, length)
 
@@ -49,5 +49,5 @@ class Collage:
 
             start += int(len(self.sections[section_name].data) * (1 - overlap))
 
-        self.audio.output_data = output_data
+        export(output_data)
 
