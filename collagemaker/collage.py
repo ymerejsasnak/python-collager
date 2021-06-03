@@ -5,23 +5,32 @@ import numpy as np
 
 
 from collagemaker.section import Section
+from collagemaker.settings import Settings
 from collagemaker.utility import load_wav_paths, build_sample_pool, export
 
 
 class Collage:
 
-    def __init__(self, parent_dir: str = 'D:/Samples', sub_dirs: List[str] = None):
-        self.sections = {}  # section label/name as key and section object as val
-        self.structure = []  # list of section labels in order for piece
+    def __init__(self):
+        self.settings = Settings()
 
-        self.paths = load_wav_paths(parent_dir=parent_dir, sub_dirs=sub_dirs)
+        self.sections = {}  # section label/name as key and section object as val
+        self.structure = self.settings.collage.structure  # list of section labels in order for piece
+
+        self.paths = load_wav_paths(
+            parent_dir=self.settings.collage.parent_dir,
+            sub_dirs=self.settings.collage.sub_dirs
+        )
         self.sample_pool = build_sample_pool(self.paths)
 
-    def create_section(self, name: str, sample_pool_size: int = 10, length: int = 20):
+        for section_name in self.settings.collage.sections:
+            self.create_section(section_name)
 
-        data_to_use = [choice(self.sample_pool) for _ in range(sample_pool_size)]
+    def create_section(self, name: str):
 
-        section = Section(data_to_use, length)
+        data_pool = [choice(self.sample_pool) for _ in range(self.settings.section.pool_size)]
+
+        section = Section(data_pool, self.settings)
 
         self.sections[name] = section
 
@@ -29,11 +38,11 @@ class Collage:
 
         self.structure = section_list
 
-        full_length = sum([len(self.sections[section].data) for section in self.structure]) # subtract overlap though
+        full_length = sum([len(self.sections[section].data) for section in self.structure])  # subtract overlap though
         output_data = np.zeros(shape=(full_length, 2))
         used_sections = []
 
-        overlap = .1
+        overlap = self.settings.collage.overlap
         start = 0
 
         for section_name in self.structure:

@@ -9,18 +9,18 @@ from collagemaker.utility import apply_fades
 
 class Slice:
 
-    def __init__(self, source_data: np.ndarray, lengths: range = range(100, 300), fades: Tuple[float] = (0.01, 0.01)):
+    def __init__(self, source_data: np.ndarray, settings):
 
         self.source_data = source_data
-        self.lengths = lengths
-        self.fades = fades
         self.data = None
+
+        self.settings = settings
 
         self.compose()
 
     def compose(self):
         # decide length in samples
-        length = int(choice(self.lengths) * SAMPLES_PER_MS)
+        length = int(choice(self.settings.slice.lengths) * SAMPLES_PER_MS)
 
         # decide portion of sample to use (if smaller than 'length' just uses entire sample)
         offset = 0
@@ -29,4 +29,4 @@ class Slice:
         else:
             length = len(self.source_data)
 
-        self.data = apply_fades(self.source_data[offset: offset + length], self.fades)
+        self.data = apply_fades(self.source_data[offset: offset + length], self.settings.slice.fades)

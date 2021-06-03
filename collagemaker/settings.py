@@ -19,10 +19,11 @@ class Settings:
         )
 
         Section = namedtuple('Section',
-                             ('length', 'motif_count', 'samples_per_motif', 'motif_occurrences'))
+                             ('length', 'pool_size', 'motif_count', 'samples_per_motif', 'motif_occurrences'))
 
         self.section = Section(
             length=30,  # seconds
+            pool_size=10,
             motif_count=10,
             samples_per_motif=4,
             motif_occurrences=3,
@@ -45,9 +46,9 @@ class Settings:
         )
 
         Slice = namedtuple('Slice',
-                           ('length', 'fades'))
+                           ('lengths', 'fades'))
 
         self.slice = Slice(
-            length=range(100, 300),
+            lengths=range(100, 300),
             fades=(0.01, 0.01),
         )
