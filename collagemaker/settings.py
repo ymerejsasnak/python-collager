@@ -12,21 +12,21 @@ class Settings:
         self.collage = Collage(
             parent_dir='D:/Samples',
             sub_dirs=[],
-            main_pool_size=30,
-            sections=('a', 'b'),
-            structure=('a', 'b', 'a', 'b', 'a'),
-            overlap=0.1,
+            main_pool_size=30,  # size of sample pool for entire collage
+            sections=('a', 'b', 'c'),
+            structure=('a', 'b', 'c', 'b', 'a'),
+            overlap=0.1,  # percentage of section length that overlaps with next (or was it previous?) section
         )
 
         Section = namedtuple('Section',
                              ('length', 'pool_size', 'motif_count', 'samples_per_motif', 'motif_occurrences'))
 
         self.section = Section(
-            length=30,  # seconds
-            pool_size=10,
-            motif_count=10,
-            samples_per_motif=4,
-            motif_occurrences=3,
+            length=range(30, 50),  # seconds
+            pool_size=range(5, 20),  # size of sample pool for this section
+            motif_count=range(5, 20),  # number of unique motifs to generate for this section
+            samples_per_motif=range(1, 10),
+            motif_occurrences=range(1, 5),  # number of times a motif is reused per section
         )
 
         Motif = namedtuple('Motif',
@@ -34,7 +34,7 @@ class Settings:
 
         self.motif = Motif(
             gesture_count=range(2, 10),
-            fades=(0, 0),
+            fades=(range(0, 50), range(0, 50)),  # fades as percent values since range requires ints
         )
 
         Gesture = namedtuple('Gesture',
@@ -42,13 +42,13 @@ class Settings:
 
         self.gesture = Gesture(
             repeats=range(1, 10),
-            fades=(0.1, 0.1),
+            fades=(range(0, 50), range(0, 50)),
         )
 
         Slice = namedtuple('Slice',
-                           ('lengths', 'fades'))
+                           ('length', 'fades'))
 
         self.slice = Slice(
-            lengths=range(100, 300),
-            fades=(0.01, 0.01),
+            length=range(50, 500),
+            fades=(range(1, 50), range(1, 50)),
         )

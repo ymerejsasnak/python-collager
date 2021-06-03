@@ -1,4 +1,4 @@
-from random import choices, randint
+from random import choices, randint, choice
 from typing import List
 
 import numpy as np
@@ -15,7 +15,9 @@ class Section:
         self.settings = settings
 
         self.motifs = []
-        self.data = np.zeros(shape=(int(self.settings.section.length * 1000 * SAMPLES_PER_MS), 2))
+
+        length = choice(self.settings.section.length)
+        self.data = np.zeros(shape=(int(length * 1000 * SAMPLES_PER_MS), 2))
 
         self.compose()
 
@@ -23,11 +25,19 @@ class Section:
 
     def compose(self):
 
-        self.motifs = [Motif(choices(self.sample_pool, k=self.settings.section.samples_per_motif), self.settings)
-                       for _ in range(self.settings.section.motif_count)]
+        # this would be where to choose to clear existing data first (from same section made previously)
+
+        samples_per_motif = choice(self.settings.section.samples_per_motif)
+        motif_count = choice(self.settings.section.motif_count)
+
+        self.motifs = [Motif(choices(self.sample_pool, k=samples_per_motif), self.settings)
+                       for _ in range(motif_count)]
 
         for motif in self.motifs:
-            for i in range(self.settings.section.motif_occurrences):
+
+            motif_occurrences = choice(self.settings.section.motif_occurrences)
+
+            for i in range(motif_occurrences):
 
                 start = randint(0, len(self.data) - len(motif.data))
 

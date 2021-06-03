@@ -12,11 +12,11 @@ from datetime import datetime
 SAMPLES_PER_MS = 44.1
 
 
-def apply_fades(data: np.ndarray, fades: Tuple[float]):
+def apply_fades(data: np.ndarray, fades: Tuple[range]):
     length = len(data)
 
-    fade_in_length = int(fades[0] * length)
-    fade_out_length = int(fades[1] * length)
+    fade_in_length = int(choice(fades[0])/100 * length)
+    fade_out_length = int(choice(fades[1])/100 * length)
 
     fade_in_env = np.linspace(start=(0, 0), stop=(1, 1), num=fade_in_length)
     fade_in_env = np.append(fade_in_env, np.ones((length - fade_in_length, 2)), axis=0)

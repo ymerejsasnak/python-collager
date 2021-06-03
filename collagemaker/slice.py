@@ -20,7 +20,7 @@ class Slice:
 
     def compose(self):
         # decide length in samples
-        length = int(choice(self.settings.slice.lengths) * SAMPLES_PER_MS)
+        length = int(choice(self.settings.slice.length) * SAMPLES_PER_MS)
 
         # decide portion of sample to use (if smaller than 'length' just uses entire sample)
         offset = 0

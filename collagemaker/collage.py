@@ -28,7 +28,9 @@ class Collage:
 
     def create_section(self, name: str):
 
-        data_pool = [choice(self.sample_pool) for _ in range(self.settings.section.pool_size)]
+        pool_size = choice(self.settings.section.pool_size)
+
+        data_pool = [choice(self.sample_pool) for _ in range(pool_size)]
 
         section = Section(data_pool, self.settings)
 
