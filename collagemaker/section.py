@@ -39,6 +39,10 @@ class Section:
 
             for i in range(motif_occurrences):
 
+                # increase data size if new motif is longer than existing data (due to gesture repeats/spacing/etc)
+                if len(motif.data) > len(self.data):
+                    self.data = np.pad(self.data, ((0, len(motif.data) - len(self.data)), (0, 0)))
+
                 start = randint(0, len(self.data) - len(motif.data))
 
                 data = np.pad(motif.data, pad_width=((start, len(self.data) - (len(motif.data) + start)), (0, 0)))

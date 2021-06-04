@@ -14,7 +14,7 @@ class Gesture:
 
         self.data = None
         self.settings = settings
-        self.slc = Slice(sample_data, settings)
+        self.slice = Slice(sample_data, settings)
 
         self.compose()
 
@@ -22,5 +22,10 @@ class Gesture:
 
         repeats = choice(self.settings.gesture.repeats)
 
-        self.data = np.tile(self.slc.data, (repeats, 1))
+        spacing = choice(self.settings.gesture.spacing)
+        pad_count = int(spacing/100 * len(self.slice.data))
+
+        data = np.pad(self.slice.data, ((0, pad_count), (0, 0)))
+
+        self.data = np.tile(data, (repeats, 1))
         self.data = apply_fades(self.data, self.settings.gesture.fades)
