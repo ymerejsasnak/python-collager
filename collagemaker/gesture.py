@@ -22,10 +22,18 @@ class Gesture:
 
         repeats = choice(self.settings.gesture.repeats)
 
-        spacing = choice(self.settings.gesture.spacing)
-        pad_count = int(spacing/100 * len(self.slice.data))
+        spacing = int(len(self.slice.data) * choice(self.settings.gesture.spacing)/100)
 
-        data = np.pad(self.slice.data, ((0, pad_count), (0, 0)))
+        # calculate total output length...
+        data_length = len(self.slice.data) * repeats + spacing * (repeats - 1)
 
-        self.data = np.tile(data, (repeats, 1))
+        self.data = np.zeros((data_length, 2))
+
+        # then just add padded slices
+        position = 0
+        for r in range(repeats):
+            data = np.pad(self.slice.data, ((position, len(self.data) - len(self.slice.data) - position), (0, 0)))
+            self.data += data
+            position += len(self.slice.data) + spacing
+
         self.data = apply_fades(self.data, self.settings.gesture.fades)
