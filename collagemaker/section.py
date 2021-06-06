@@ -53,9 +53,9 @@ class Section:
 
     def generate_texture(self, data: np.ndarray):
 
-        # add to settings?
-        texture_volume = 0.2
-        texture_depth = 100
+        # currently same section generates new texture...ok??
+        texture_volume = choice(self.settings.section.texture_volume) / 100
+        texture_depth = choice(self.settings.section.texture_depth)
 
         texture = (np.zeros(shape=np.shape(data)))
 
