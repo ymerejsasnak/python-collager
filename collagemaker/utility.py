@@ -75,12 +75,16 @@ def build_sample_pool(paths: List[str], sample_pool_size: int = 20):
     return sample_pool
 
 
-def export(data: np.ndarray, filename: str = '%m-%d-%Y %H.%M.%S.wav'):
-    path = 'd:\\CODING\\Python\\Audio\\Collager\\' + filename
-
-    # normalize
+def normalize(data: np.ndarray):
     mx = max(data.max(initial=0), abs(data.min(initial=0)))
     if mx != 0:
         data /= mx
+    return data
+
+
+def export(data: np.ndarray, filename: str = '%m-%d-%Y %H.%M.%S.wav'):
+    path = 'd:\\CODING\\Python\\Audio\\Collager\\' + filename
+
+    data = normalize(data)
 
     scipy.io.wavfile.write(datetime.now().strftime(path), 44100, np.array(data))

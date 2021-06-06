@@ -5,6 +5,7 @@ import numpy as np
 
 from collagemaker.utility import SAMPLES_PER_MS
 from collagemaker.utility import apply_fades
+from collagemaker.utility import normalize
 
 
 class Slice:
@@ -30,3 +31,4 @@ class Slice:
             length = len(self.source_data)
 
         self.data = apply_fades(self.source_data[offset: offset + length], self.settings.slice.fades)
+        self.data = normalize(self.data)
