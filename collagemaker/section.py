@@ -4,7 +4,7 @@ from typing import List
 import numpy as np
 
 from collagemaker.settings import Settings
-from collagemaker.utility import SAMPLES_PER_MS
+from collagemaker.utility import SAMPLES_PER_MS, normalize
 from collagemaker.motif import Motif
 
 
@@ -47,3 +47,27 @@ class Section:
 
                 data = np.pad(motif.data, pad_width=((start, len(self.data) - (len(motif.data) + start)), (0, 0)))
                 self.data += data
+
+        # do texture last because won't be certain about length until then
+        self.data += self.generate_texture(self.data)
+
+    def generate_texture(self, data: np.ndarray):
+
+        # add to settings?
+        texture_volume = 0.2
+        texture_depth = 100
+
+        texture = (np.zeros(shape=np.shape(data)))
+
+        for i in range(texture_depth):
+            sample = choice(self.sample_pool)
+
+            if len(sample) > len(texture):
+                offset = randint(0, len(sample) - len(texture))
+                texture += sample[offset: offset + len(texture)]
+            else:
+                position = randint(0, len(texture) - len(sample))
+                sample = np.pad(sample, pad_width=((position, len(texture) - (len(sample) + position)), (0, 0)))
+                texture += sample
+
+        return normalize(texture) * texture_volume
