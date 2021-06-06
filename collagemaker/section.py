@@ -62,12 +62,20 @@ class Section:
         for i in range(texture_depth):
             sample = choice(self.sample_pool)
 
-            if len(sample) > len(texture):
-                offset = randint(0, len(sample) - len(texture))
-                texture += sample[offset: offset + len(texture)]
-            else:
-                position = randint(0, len(texture) - len(sample))
-                sample = np.pad(sample, pad_width=((position, len(texture) - (len(sample) + position)), (0, 0)))
-                texture += sample
+            for ch in range(2):
+                if len(sample) > len(texture):
+                    offset = randint(0, len(sample) - len(texture))
+                    data = sample[offset: offset + len(texture)]
+                    data = data.T
+                    data[ch] = np.zeros(len(data[ch]))
+                    data = data.T
+                    texture += data
+                else:
+                    position = randint(0, len(texture) - len(sample))
+                    data = np.pad(sample, pad_width=((position, len(texture) - (len(sample) + position)), (0, 0)))
+                    data = data.T
+                    data[ch] = np.zeros(len(data[ch]))
+                    data = data.T
+                    texture += data
 
         return normalize(texture) * texture_volume
