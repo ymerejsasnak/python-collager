@@ -1,4 +1,4 @@
-from random import randint, choice
+from random import randint, choice, random
 from typing import Tuple
 
 import numpy as np
@@ -31,4 +31,10 @@ class Slice:
             length = len(self.source_data)
 
         self.data = apply_fades(self.source_data[offset: offset + length], self.settings.slice.fades)
+
+        self.data = self.data.T
+        self.data[0] *= random()
+        self.data[1] *= random()
+        self.data = self.data.T
+
         self.data = normalize(self.data)
