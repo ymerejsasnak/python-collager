@@ -2,6 +2,7 @@ from random import choice
 from typing import Tuple
 
 import numpy as np
+from scipy.signal import resample
 
 from collagemaker.settings import Settings
 from collagemaker.utility import apply_fades
@@ -22,18 +23,30 @@ class Gesture:
 
         repeats = choice(self.settings.gesture.repeats)
 
-        spacing = int(len(self.slice.data) * choice(self.settings.gesture.spacing)/100)
+        spacing = choice(self.settings.gesture.spacing) / 100
+
+        # per-slice rate change
+        slice_rates = [choice(self.settings.gesture.slice_rate) for _ in range(repeats)]
+        slice_data = [resample(self.slice.data, int(len(self.slice.data) * slice_rates[i])) for i in range(repeats)]
 
         # calculate total output length...
-        data_length = len(self.slice.data) * repeats + spacing * (repeats - 1)
+        data_length = int(sum([len(slice_data[i]) * (1 + spacing) for i in range(repeats)]))
 
         self.data = np.zeros((data_length, 2))
 
         # then just add padded slices
         position = 0
         for r in range(repeats):
-            data = np.pad(self.slice.data, ((position, len(self.data) - len(self.slice.data) - position), (0, 0)))
+            data = slice_data[r]
+            start = position
+            end = len(self.data) - len(data) - position
+            position += int(len(data) * (1 + spacing))
+            data = np.pad(data, ((start, end), (0, 0)))
+
             self.data += data
-            position += len(self.slice.data) + spacing
+
 
         self.data = apply_fades(self.data, self.settings.gesture.fades)
+
+        # per-gesture rate change
+        self.data = resample(self.data, int(len(self.data) * choice(self.settings.gesture.gesture_rate)))

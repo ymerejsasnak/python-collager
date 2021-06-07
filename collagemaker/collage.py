@@ -50,7 +50,9 @@ class Collage:
 
         for section_name in self.structure:
             if section_name in used_sections:
+                print('building new section "' + section_name + '"...')
                 self.sections[section_name].compose()  # redo the section (currently overlays on existing)
+                print('done')
             else:
                 used_sections.append(section_name)
 

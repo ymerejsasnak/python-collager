@@ -1,7 +1,8 @@
-from random import randint, choice, random
+from random import randint, choice, random, uniform
 from typing import Tuple
 
 import numpy as np
+import scipy.signal
 
 from collagemaker.utility import SAMPLES_PER_MS
 from collagemaker.utility import apply_fades
@@ -30,11 +31,14 @@ class Slice:
         else:
             length = len(self.source_data)
 
+        # fade
         self.data = apply_fades(self.source_data[offset: offset + length], self.settings.slice.fades)
 
+        # channel volumes
         self.data = self.data.T
         self.data[0] *= random()/2 + 0.5
         self.data[1] *= random()/2 + 0.5
         self.data = self.data.T
 
+        # normalize
         self.data = normalize(self.data)
