@@ -33,8 +33,8 @@ class Slice:
         self.data = apply_fades(self.source_data[offset: offset + length], self.settings.slice.fades)
 
         self.data = self.data.T
-        self.data[0] *= random()
-        self.data[1] *= random()
+        self.data[0] *= random()/2 + 0.5
+        self.data[1] *= random()/2 + 0.5
         self.data = self.data.T
 
         self.data = normalize(self.data)

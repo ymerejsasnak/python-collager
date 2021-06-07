@@ -24,7 +24,9 @@ class Collage:
         self.sample_pool = build_sample_pool(self.paths)
 
         for section_name in self.settings.collage.sections:
+            print('Building section \"' + section_name + '\"...', end="")
             self.create_section(section_name)
+            print('done')
 
     def create_section(self, name: str):
 
@@ -37,6 +39,7 @@ class Collage:
         self.sections[name] = section
 
     def build(self):
+        print('building collage...')
 
         full_length = sum([len(self.sections[section].data) for section in self.structure])  # subtract overlap though
         output_data = np.zeros(shape=(full_length, 2))
@@ -46,7 +49,6 @@ class Collage:
         start = 0
 
         for section_name in self.structure:
-
             if section_name in used_sections:
                 self.sections[section_name].compose()  # redo the section (currently overlays on existing)
             else:
@@ -57,6 +59,5 @@ class Collage:
             output_data += d
 
             start += int(len(self.sections[section_name].data) * (1 - overlap))
-
         export(output_data)
 
