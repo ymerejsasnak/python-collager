@@ -1,9 +1,8 @@
-from random import randint, choice, random, uniform
-from typing import Tuple
+from random import randint, choice, random
 
 import numpy as np
-import scipy.signal
 
+from collagemaker.settings import Settings
 from collagemaker.utility import SAMPLES_PER_MS
 from collagemaker.utility import apply_fades
 from collagemaker.utility import normalize
@@ -11,7 +10,7 @@ from collagemaker.utility import normalize
 
 class Slice:
 
-    def __init__(self, source_data: np.ndarray, settings):
+    def __init__(self, source_data: np.ndarray, settings: Settings):
 
         self.source_data = source_data
         self.data = None
@@ -24,21 +23,24 @@ class Slice:
         # decide length in samples
         length = int(choice(self.settings.slice.length) * SAMPLES_PER_MS)
 
-        # decide portion of sample to use (if smaller than 'length' just uses entire sample)
+        # decide portion of sample to use
         offset = 0
-        if len(self.source_data) > length:
-            offset = randint(0, len(self.source_data) - length)
+        source_length = len(self.source_data[0])
+        if source_length > length:
+            offset = randint(0, source_length - length)
+        # (if smaller than 'length' just uses entire sample)
         else:
-            length = len(self.source_data)
+            length = source_length
+
+        # slice the data
+        self.data = self.source_data[:, offset: offset + length]
 
         # fade
-        self.data = apply_fades(self.source_data[offset: offset + length], self.settings.slice.fades)
+        self.data = apply_fades(self.data, self.settings.slice.fades)
 
         # channel volumes
-        self.data = self.data.T
-        self.data[0] *= random()/2 + 0.5
-        self.data[1] *= random()/2 + 0.5
-        self.data = self.data.T
+        self.data[0] *= random() / 2 + 0.5
+        self.data[1] *= random() / 2 + 0.5
 
         # normalize
         self.data = normalize(self.data)

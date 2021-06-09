@@ -26,5 +26,5 @@ class Motif:
         # create gestures
         self.gestures = [Gesture(choice(self.sample_pool), self.settings) for _ in range(count)]
 
-        self.data = [apply_fades(g.data, self.settings.motif.fades) for g in self.gestures]
-        self.data = np.concatenate(self.data)
+        data = [apply_fades(g.data, self.settings.motif.fades) for g in self.gestures]
+        self.data = np.concatenate(data, axis=1)

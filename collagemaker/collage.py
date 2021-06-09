@@ -21,7 +21,7 @@ class Collage:
             parent_dir=self.settings.collage.parent_dir,
             sub_dirs=self.settings.collage.sub_dirs
         )
-        self.sample_pool = build_sample_pool(self.paths)
+        self.sample_pool = build_sample_pool(self.paths, self.settings.collage.main_pool_size)
 
         for section_name in self.settings.collage.sections:
             print('Building section \"' + section_name + '\"...', end="")
@@ -41,8 +41,8 @@ class Collage:
     def build(self):
         print('building collage...')
 
-        full_length = sum([len(self.sections[section].data) for section in self.structure])  # subtract overlap though
-        output_data = np.zeros(shape=(full_length, 2))
+        full_length = sum([len(self.sections[section].data[0]) for section in self.structure])  # not counting overlap
+        output_data = np.zeros(shape=(2, full_length))
         used_sections = []
 
         overlap = self.settings.collage.overlap
@@ -57,9 +57,11 @@ class Collage:
                 used_sections.append(section_name)
 
             d = self.sections[section_name].data
-            d = np.pad(d, pad_width=((start, full_length - (start + len(d))), (0, 0)))
+            # *** fixme
+            d = np.pad(d, pad_width=((0, 0), (start, full_length - (start + len(d[0])))))
             output_data += d
 
-            start += int(len(self.sections[section_name].data) * (1 - overlap))
+            start += int(len(self.sections[section_name].data[0]) * (1 - overlap))
+
         export(output_data)
 

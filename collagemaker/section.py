@@ -4,7 +4,7 @@ from typing import List
 import numpy as np
 
 from collagemaker.settings import Settings
-from collagemaker.utility import SAMPLES_PER_MS, normalize
+from collagemaker.utility import SAMPLES_PER_MS, normalize, offset_mix
 from collagemaker.motif import Motif
 
 
@@ -17,15 +17,11 @@ class Section:
         self.motifs = []
 
         length = choice(self.settings.section.length)
-        self.data = np.zeros(shape=(int(length * 1000 * SAMPLES_PER_MS), 2))
+        self.data = np.zeros(shape=(2, int(length * 1000 * SAMPLES_PER_MS)))
 
         self.compose()
 
-    # section maybe handles creation of each lower level for more control of each in a less hierarchical way?
-
     def compose(self):
-
-        # this would be where to choose to clear existing data first (from same section made previously)
 
         samples_per_motif = choice(self.settings.section.samples_per_motif)
         motif_count = choice(self.settings.section.motif_count)
@@ -38,18 +34,11 @@ class Section:
             motif_occurrences = choice(self.settings.section.motif_occurrences)
 
             for i in range(motif_occurrences):
-
-                # increase data size if new motif is longer than existing data (due to gesture repeats/spacing/etc)
-                if len(motif.data) > len(self.data):
-                    self.data = np.pad(self.data, ((0, len(motif.data) - len(self.data)), (0, 0)))
-
-                start = randint(0, len(self.data) - len(motif.data))
-
-                data = np.pad(motif.data, pad_width=((start, len(self.data) - (len(motif.data) + start)), (0, 0)))
-                self.data += data
+                start = randint(0, len(self.data[0]) - len(motif.data[0]))
+                self.data = offset_mix(self.data, motif.data, start)
 
         # do texture last because won't be certain about length until then
-        self.data += self.generate_texture(self.data)
+        self.data = offset_mix(self.data, self.generate_texture(self.data), 0)
 
     def generate_texture(self, data: np.ndarray):
 
@@ -58,24 +47,22 @@ class Section:
         texture_depth = choice(self.settings.section.texture_depth)
 
         texture = (np.zeros(shape=np.shape(data)))
+        texture_length = len(texture[0])
 
         for i in range(texture_depth):
             sample = choice(self.sample_pool)
+            sample_length = len(sample[0])
 
+            # do each channel separately
             for ch in range(2):
-                if len(sample) > len(texture):
-                    offset = randint(0, len(sample) - len(texture))
-                    data = sample[offset: offset + len(texture)]
-                    data = data.T
+                if sample_length > texture_length:
+                    offset = randint(0, sample_length - texture_length)
+                    data = sample[:, offset: offset + texture_length]
                     data[ch] = np.zeros(len(data[ch]))
-                    data = data.T
-                    texture += data
+                    texture = offset_mix(texture, data, offset)
                 else:
-                    position = randint(0, len(texture) - len(sample))
-                    data = np.pad(sample, pad_width=((position, len(texture) - (len(sample) + position)), (0, 0)))
-                    data = data.T
+                    position = randint(0, texture_length - sample_length)
                     data[ch] = np.zeros(len(data[ch]))
-                    data = data.T
-                    texture += data
+                    texture = offset_mix(texture, data, position)
 
         return normalize(texture) * texture_volume

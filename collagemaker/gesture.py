@@ -5,7 +5,7 @@ import numpy as np
 from scipy.signal import resample
 
 from collagemaker.settings import Settings
-from collagemaker.utility import apply_fades
+from collagemaker.utility import apply_fades, offset_mix
 from collagemaker.slice import Slice
 
 
@@ -21,32 +21,26 @@ class Gesture:
 
     def compose(self):
 
+        self.data = np.zeros((2, 1))
+
         repeats = choice(self.settings.gesture.repeats)
+        spacing_hold = choice(self.settings.gesture.spacing_hold)
 
-        spacing = choice(self.settings.gesture.spacing) / 100
-
-        # per-slice rate change
-        slice_rates = [choice(self.settings.gesture.slice_rate) for _ in range(repeats)]
-        slice_data = [resample(self.slice.data, int(len(self.slice.data) * slice_rates[i])) for i in range(repeats)]
-
-        # calculate total output length...
-        data_length = int(sum([len(slice_data[i]) * (1 + spacing) for i in range(repeats)]))
-
-        self.data = np.zeros((data_length, 2))
+        if spacing_hold:
+            space = choice(self.settings.gesture.spacing) / 100
+            spacings = [space for _ in range(repeats)]
+        else:
+            spacings = [choice(self.settings.gesture.spacing) / 100 for _ in range(repeats)]
 
         # then just add padded slices
         position = 0
-        for r in range(repeats):
-            data = slice_data[r]
-            start = position
-            end = len(self.data) - len(data) - position
-            position += int(len(data) * (1 + spacing))
-            data = np.pad(data, ((start, end), (0, 0)))
-
-            self.data += data
-
+        for i in range(repeats):
+            rate = choice(self.settings.gesture.slice_rate)
+            data = resample(self.slice.data, int(len(self.slice.data[0]) * rate), axis=1)
+            self.data = offset_mix(self.data, data, position)
+            position += int(len(data[0]) * (1 + spacings[i]))
 
         self.data = apply_fades(self.data, self.settings.gesture.fades)
 
         # per-gesture rate change
-        self.data = resample(self.data, int(len(self.data) * choice(self.settings.gesture.gesture_rate)))
+        self.data = resample(self.data, int(len(self.data[0]) * choice(self.settings.gesture.gesture_rate)), axis=1)
