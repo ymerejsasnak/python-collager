@@ -22,12 +22,13 @@ class Settings:
         )
 
         Section = namedtuple('Section',
-                             ('pool_size', 'motif_count', 'samples_per_motif', 'motif_occurrences',
+                             ('min_length', 'pool_size', 'motif_count', 'samples_per_motif', 'motif_occurrences',
                               'texture_volume', 'texture_depth'))
 
         self.section = Section(
+            min_length=range(30, 40),  # minimum length in seconds
             pool_size=range(5, 10),  # size of sample pool for this section
-            motif_count=range(5, 15),  # number of unique motifs to generate for this section
+            motif_count=range(5, 10),  # number of unique motifs to generate for this section
             samples_per_motif=range(3, 10),
             motif_occurrences=range(2, 6),  # number of times a motif is reused per section
             texture_volume=range(25, 45),  # int represents %

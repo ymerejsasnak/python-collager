@@ -4,7 +4,7 @@ from typing import List
 import numpy as np
 
 from collagemaker.settings import Settings
-from collagemaker.utility import normalize, offset_mix
+from collagemaker.utility import normalize, offset_mix, SAMPLES_PER_MS
 from collagemaker.motif import Motif
 
 
@@ -16,7 +16,7 @@ class Section:
 
         self.motifs = []
 
-        self.data = np.zeros(shape=(2, 1))
+        self.data = np.zeros(shape=(2, int(choice(settings.section.min_length) * 1000 * SAMPLES_PER_MS)))
 
         self.compose()
 
