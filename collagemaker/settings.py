@@ -28,18 +28,18 @@ class Settings:
         self.section = Section(
             length=range(30, 40),  # seconds (target time, may be longer if motifs end up longer)
             pool_size=range(5, 10),  # size of sample pool for this section
-            motif_count=range(2, 5),  # number of unique motifs to generate for this section
-            samples_per_motif=range(1, 5),
-            motif_occurrences=range(1, 2),  # number of times a motif is reused per section
-            texture_volume=range(15, 25),  # int represents %
-            texture_depth=range(30, 50),  # number of iterations of sample mixing for texture
+            motif_count=range(5, 15),  # number of unique motifs to generate for this section
+            samples_per_motif=range(3, 10),
+            motif_occurrences=range(2, 6),  # number of times a motif is reused per section
+            texture_volume=range(25, 45),  # int represents %
+            texture_depth=range(130, 150),  # number of iterations of sample mixing for texture
         )
 
         Motif = namedtuple('Motif',
                            ('gesture_count', 'fades'))
 
         self.motif = Motif(
-            gesture_count=range(1, 4),
+            gesture_count=range(1, 14),
             fades=(range(0, 50), range(0, 50)),  # fades as percent values since range requires ints
         )
 
@@ -47,7 +47,7 @@ class Settings:
                              ('repeats', 'spacing', 'spacing_hold', 'fades', 'slice_rate', 'gesture_rate'))
 
         self.gesture = Gesture(
-            repeats=range(1, 5),
+            repeats=range(1, 15),
             spacing=[randint(-90, 300) for _ in range(5)],  # % of slice length to add as spacing before next repeat
             spacing_hold=[True],  # false doesn't work yet
             fades=(range(1, 50), range(1, 50)),
@@ -62,7 +62,7 @@ class Settings:
                            ('length', 'fades',))
 
         self.slice = Slice(
-            length=[randint(100, 300) for _ in range(5)],
+            length=[randint(100, 600) for _ in range(5)],
             fades=(range(10, 75), range(10, 75)),
 
         )

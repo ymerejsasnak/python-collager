@@ -6,7 +6,7 @@ import numpy as np
 
 from collagemaker.section import Section
 from collagemaker.settings import Settings
-from collagemaker.utility import load_wav_paths, build_sample_pool, export
+from collagemaker.utility import load_wav_paths, build_sample_pool, export, offset_mix
 
 
 class Collage:
@@ -57,11 +57,9 @@ class Collage:
                 used_sections.append(section_name)
 
             d = self.sections[section_name].data
-            # *** fixme
-            d = np.pad(d, pad_width=((0, 0), (start, full_length - (start + len(d[0])))))
-            output_data += d
+            output_data = offset_mix(output_data, d, start)
 
-            start += int(len(self.sections[section_name].data[0]) * (1 - overlap))
+            start += int(len(d[0]) * (1 - overlap))
 
         export(output_data)
 

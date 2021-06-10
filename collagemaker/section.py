@@ -16,13 +16,13 @@ class Section:
 
         self.motifs = []
 
-        length = choice(self.settings.section.length)
-        self.data = np.zeros(shape=(2, int(length * 1000 * SAMPLES_PER_MS)))
+        self.length = choice(self.settings.section.length)
+        self.data = np.zeros(shape=(2, int(self.length * 1000 * SAMPLES_PER_MS)))
 
         self.compose()
 
     def compose(self):
-
+        '''
         samples_per_motif = choice(self.settings.section.samples_per_motif)
         motif_count = choice(self.settings.section.motif_count)
 
@@ -34,35 +34,56 @@ class Section:
             motif_occurrences = choice(self.settings.section.motif_occurrences)
 
             for i in range(motif_occurrences):
-                start = randint(0, len(self.data[0]) - len(motif.data[0]))
+                start = randint(0, max(0, self.length - len(motif.data[0])))
                 self.data = offset_mix(self.data, motif.data, start)
-
+        '''
         # do texture last because won't be certain about length until then
-        self.data = offset_mix(self.data, self.generate_texture(self.data), 0)
+        self.data += self.generate_texture(len(self.data[0]))
 
-    def generate_texture(self, data: np.ndarray):
+    def generate_texture(self, length: int):
 
         # currently same section generates new texture...ok??
         texture_volume = choice(self.settings.section.texture_volume) / 100
         texture_depth = choice(self.settings.section.texture_depth)
 
-        texture = (np.zeros(shape=np.shape(data)))
-        texture_length = len(texture[0])
+        texture = np.zeros(shape=(2, length))
 
         for i in range(texture_depth):
             sample = choice(self.sample_pool)
             sample_length = len(sample[0])
 
-            # do each channel separately
+
+
+
+            offset = 0
+            if sample_length < length:
+                offset = randint(0, length - sample_length)
+            if sample_length > length:
+                sample = sample[:, :length]  # temp...just shorten to length for now
+
+
+            texture = offset_mix(texture, sample, offset)
+
+
+            '''
+            # reimplement do each channel separately
             for ch in range(2):
-                if sample_length > texture_length:
-                    offset = randint(0, sample_length - texture_length)
-                    data = sample[:, offset: offset + texture_length]
-                    data[ch] = np.zeros(len(data[ch]))
-                    texture = offset_mix(texture, data, offset)
+                if sample_length < length:
+                    offset = randint(0, length - sample_length)
+                    
+                    
+                    offset = randint(0, sample_length - length)
+                    sample = sample[:, offset: offset + length]
+                    print(sample.shape)
+                    sample[ch] = np.zeros(len(sample[ch]))
+                    print(sample.shape)
+                    texture = offset_mix(texture, sample, offset)
                 else:
-                    position = randint(0, texture_length - sample_length)
-                    data[ch] = np.zeros(len(data[ch]))
-                    texture = offset_mix(texture, data, position)
+                    position = randint(0, length - sample_length)
+                    print(sample.shape)
+                    sample[ch] = np.zeros(len(sample[ch]))
+                    print(sample.shape)
+                    texture = offset_mix(texture, sample, position)
+            '''
 
         return normalize(texture) * texture_volume

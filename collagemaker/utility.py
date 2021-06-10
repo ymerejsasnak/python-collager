@@ -110,11 +110,10 @@ def offset_mix(first: np.ndarray, second: np.ndarray, offset: int):
 
     if len(first[0]) < new_length:
         padding = new_length - len(first[0])
-        first = np.pad(first, ((0, 0), (0, padding)))
+        first = np.pad(first, pad_width=((0, 0), (0, padding)))
 
-    if offset > 0:
-        pad_before = offset
-        pad_after = max(len(first[0]) - (len(second[0]) + offset), 0)
-        second = np.pad(second, pad_width=((0, 0), (pad_before, pad_after)))
+    pad_before = offset
+    pad_after = new_length - (len(second[0]) + offset)
+    second = np.pad(second, pad_width=((0, 0), (pad_before, pad_after)))
 
     return first + second
