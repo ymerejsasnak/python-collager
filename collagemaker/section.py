@@ -51,38 +51,18 @@ class Section:
             sample = choice(self.sample_pool)
             sample_length = len(sample[0])
 
-
-
-
-            offset = 0
-            if sample_length < length:
-                offset = randint(0, length - sample_length)
             if sample_length > length:
-                sample = sample[:, :length]  # temp...just shorten to length for now
+                sample = sample[:, :length]
+                sample_length = length
 
+            # shift channels separately
+            for ch in range(2):
+                temp_data = sample[ch]  # store the opposite channels data
+                sample = np.roll(sample, randint(0, sample_length), axis=1)  # shift the samples, wrapping back to beginning
+                sample[ch] = temp_data
+
+            offset = randint(0, length - sample_length)
 
             texture = offset_mix(texture, sample, offset)
-
-
-            '''
-            # reimplement do each channel separately
-            for ch in range(2):
-                if sample_length < length:
-                    offset = randint(0, length - sample_length)
-                    
-                    
-                    offset = randint(0, sample_length - length)
-                    sample = sample[:, offset: offset + length]
-                    print(sample.shape)
-                    sample[ch] = np.zeros(len(sample[ch]))
-                    print(sample.shape)
-                    texture = offset_mix(texture, sample, offset)
-                else:
-                    position = randint(0, length - sample_length)
-                    print(sample.shape)
-                    sample[ch] = np.zeros(len(sample[ch]))
-                    print(sample.shape)
-                    texture = offset_mix(texture, sample, position)
-            '''
 
         return normalize(texture) * texture_volume

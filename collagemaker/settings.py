@@ -48,10 +48,10 @@ class Settings:
         self.gesture = Gesture(
             repeats=range(1, 15),
             spacing=[randint(-90, 300) for _ in range(5)],  # % of slice length to add as spacing before next repeat
-            spacing_hold=[True],  # false doesn't work yet
+            spacing_hold=[choice([True, True, False]) for _ in range(5)],
             fades=(range(1, 50), range(1, 50)),
 
-            gesture_rate=[uniform(0.6, 1.75) for _ in range(5)],
+            gesture_rate=[uniform(0.8, 1.5) for _ in range(5)],
             slice_rate=[uniform(0.9, 1.1) for _ in range(5)],
 
             # shift % (amount slice changes position/offset each iteration)
