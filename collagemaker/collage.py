@@ -1,5 +1,4 @@
 from random import choice
-from typing import List
 
 import numpy as np
 
@@ -32,6 +31,7 @@ class Collage:
 
         pool_size = choice(self.settings.section.pool_size)
 
+        # choose sub-pool from main pool to use in section
         data_pool = [choice(self.sample_pool) for _ in range(pool_size)]
 
         section = Section(data_pool, self.settings)

@@ -4,7 +4,7 @@ from typing import List
 import numpy as np
 
 from collagemaker.settings import Settings
-from collagemaker.utility import SAMPLES_PER_MS, normalize, offset_mix
+from collagemaker.utility import normalize, offset_mix
 from collagemaker.motif import Motif
 
 
@@ -16,13 +16,12 @@ class Section:
 
         self.motifs = []
 
-        self.length = choice(self.settings.section.length)
-        self.data = np.zeros(shape=(2, int(self.length * 1000 * SAMPLES_PER_MS)))
+        self.data = np.zeros(shape=(2, 1))
 
         self.compose()
 
     def compose(self):
-        '''
+
         samples_per_motif = choice(self.settings.section.samples_per_motif)
         motif_count = choice(self.settings.section.motif_count)
 
@@ -34,9 +33,9 @@ class Section:
             motif_occurrences = choice(self.settings.section.motif_occurrences)
 
             for i in range(motif_occurrences):
-                start = randint(0, max(0, self.length - len(motif.data[0])))
+                start = randint(0, max(0, len(self.data[0]) - len(motif.data[0])))  # sections are front-heavy because of the way this works right here (slowly grows in size, so becomes more sparse)
                 self.data = offset_mix(self.data, motif.data, start)
-        '''
+
         # do texture last because won't be certain about length until then
         self.data += self.generate_texture(len(self.data[0]))
 

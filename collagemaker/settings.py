@@ -14,7 +14,7 @@ class Settings:
 
         self.collage = Collage(
             parent_dir='D:/Samples',
-            sub_dirs=['Surreal Collage Layers'],
+            sub_dirs=['Misc Directories'],  # ['Surreal Collage Layers'],
             main_pool_size=20,  # size of sample pool for entire collage
             sections=('a', 'b'),
             structure=('a', 'b'),
@@ -22,11 +22,10 @@ class Settings:
         )
 
         Section = namedtuple('Section',
-                             ('length', 'pool_size', 'motif_count', 'samples_per_motif', 'motif_occurrences',
+                             ('pool_size', 'motif_count', 'samples_per_motif', 'motif_occurrences',
                               'texture_volume', 'texture_depth'))
 
         self.section = Section(
-            length=range(30, 40),  # seconds (target time, may be longer if motifs end up longer)
             pool_size=range(5, 10),  # size of sample pool for this section
             motif_count=range(5, 15),  # number of unique motifs to generate for this section
             samples_per_motif=range(3, 10),
